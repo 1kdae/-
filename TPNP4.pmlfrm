@@ -1,0 +1,1966 @@
+kill_TPNP4
+setup form !!TPNP4 dialog dock B
+
+  Title 'TPNP(For Modeling)'
+
+frame .frmmember      '  Member  '   at X0 Y0
+
+  var !width (22)                                                                                                                              
+  var !twidth ($!width - 9)                                                                                                                    
+  var !rwidth ($!width - 2)                                                                                                                    
+  var !lines (9.7)           
+
+                                                                                                                                                                                                                                             
+   selector .members at x 0 y-0.2     call |$$_members| width $!width length $!lines database auto  
+
+exit
+
+frame .frmcommand 'Command' at xmax ymin
+button .savework at x0 ymin 'Save' call |CALLG MSAVEW| width 6
+button .getwork at xmax ymin 'GetW' call |!this.getw()| width 6
+button .unclaim at xmax ymin 'Unclaim' call |unclaim all| width 6
+button .spref at xmax ymin 'Spref' call |!this.despspref()| width 6
+button .weight at xmax ymin 'Weight' call |q nwei| width 6
+button .Userm at xmax ymin 'UserM' call |q userm| width 6
+button .panel at x0 ymax 'Panel' call |SHOW!!DSMEOUTFCREATEPLATE| width 6
+button .inout at xmax ymin 'Inout' call |SHOW!!DSMEELECINOUTMODEL| width 6
+button .endcut at xmax ymin 'End cut' call |show!!opakstlendcutfrm| width 6
+button .dsmepad at xmax ymin 'Pad' call |SHOW!!DSMEOUTFPADCREATION| width 3
+button .Snip at xmax ymin 'Snip' call |show!!STLSNIPCREATION| width 3
+button .markce at xmax ymin 'MarkCE' call |mark ce| width 5.5
+button .unmarkce at xmax ymin 'Unmark' call |unmark ce| width 5.5
+
+exit
+
+frame .frmdrawcol at xmin ymax    'Color'
+OPTION _SOL  AT X0 YMin-0.1  ||     CALL || width 3
+VAR LIST _SOL PAIRS  |Solid| |0|
+|85%| |85|
+|75%| |75|
+|50%| |50|
+|25%| |25|
+|12%| |12|   
+exit
+BUTTON .C2   AT Xmax    Ymin width 1 | | CALL |!this.color(2)|   background 2    
+BUTTON .C24  AT XMAX+0.1 YMIN    width 1 | | Call |!this.color(24)|  background 24
+BUTTON .C3   AT XMAX+0.1 YMIN    width 1 | | Call |!this.color(28)|   background 28
+BUTTON .C4   AT XMAX+0.1 YMIN    width 1 | | Call |!this.color(4)|   background 4   
+BUTTON .C5   AT XMAX+0.1 YMIN    width 1 | | Call |!this.color(5)|   background 5
+BUTTON .C6   AT XMAX+0.1 YMIN    width 1 | | Call |!this.color(6)|   background 6
+BUTTON .C7   AT XMAX+0.1 YMIN    width 1 | | Call |!this.color(7)|   background 7
+BUTTON .C12  AT Xmax+0.1 Ymin    width 1 | | Call |!this.color(12)|  background 12
+BUTTON .C13  AT XMAX+0.1 YMIN    width 1 | | Call |!this.color(13)|  background 13
+BUTTON .C237 AT XMAX+0.1 YMIN    width 1 | | Call |!this.color(237)| background 237
+BUTTON .C26  AT XMAX+0.1 YMIN    width 1 | | Call |!this.color(26)|  background 26
+BUTTON .C167 AT XMAX+0.1 YMIN    width 1 | | Call |!this.color(167)| background 167
+TEXT .txtcolor      AT XMAX0.1 yMIN  call |!THIS.TXTCOLOR()| WIDTH 2.3 IS real
+!this.txtcolor.val = 365
+BUTTON .CCHANG  AT XMAX+0.1 YMIN    width 1 | | Call |!this.color(1)|  background 365
+button .resetcolor at xmax0.2 ymin width 4 |Reset| Call |!this.ResetCol()|
+exit
+
+frame .frmsavecommand at xmin ymax 'Save Command'
+button .butuser1 at x0 ymax-0.3 'User1' call || width 6
+button .butuser2 at xmax ymin 'User2' call || width 6
+button .butuser3 at xmax ymin 'User3' call || width 6
+button .butuser4 at xmax ymin 'User4' call || width 6
+button .butuser5 at xmax ymin 'User5' call || width 6
+button .butuser6 at xmax ymin 'User6' call || width 6
+button .butuser7 at x0 ymax 'User7' call || width 6
+button .butuser8 at xmax ymin 'User8' call || width 6
+button .butuser9 at xmax ymin 'User9' call || width 6
+button .butuser10 at xmax ymin 'User10' call || width 6
+button .butuser11 at xmax ymin 'User11' call || width 6
+button .butuserset at xmax3 ymin 'Set' call |!this.userbuttsetup()| width 3 background 2
+exit
+
+frame .frmextend1          '  Clipping  '   at xmax.frmdrawcol ymin.frmcommand
+   member .currentref        is dbref
+   member .Boxref            is dbref
+   member .allmemlist        is array
+   member .displaylist       is array
+   member .Boxvalue          is string
+   path right
+   BUTTON .getcol     'COL'          callback '!this.oncolset()'
+   option .transl                   at xmax+0.5 ymin width 3
+   option.opttype at xmax+0.5 ymin width 3
+     !type[1]  = 'All '
+     !type[2]  = 'Pipe'
+     !type[3]  = 'Equi'
+     !type[4]  = 'Box '
+     !type[5]  = 'Supp'
+     !type[6]  = 'Pane'
+     !type[7]  = 'Struc'
+     !type[8]  = 'Tray'
+     !type[9]  = 'Hvac'
+   !this.opttype.dtext = !type
+   !this.opttype.rtext = !type
+   BUTTON.pratio  '+' tooltip 'Increment +100' at xmax+0.3 ymin callback '!this.setrat()'
+   text.ratio  '' at xmax+0.5 ymin  width 3 is real
+   BUTTON.pratio1  '-' tooltip 'Increment -100' at xmax+0.1 ymin callback '!this.setrat1()'
+     
+   frame.frmU '' At xmin.getcol ymax.getcol
+     BUTTON.ce       at xmin.frmU+1 ymin   'CE'           callback '!this.ceM()'
+     text.limitN        '' At xmax.ce+1 ymin.ce       callback '!this.aidlineM()' width 6 is real
+     BUTTON.north 'N' at xmax.limitN+0.5 ymin.limitN callback '!this.northM()'
+     text.limitU '' at xmax.north+0.3 ymin.north callback '!this.aidlineM()' width 5.5 is real
+     BUTTON.up   'U' at xmax+0.8 ymin callback '!this.upM()'
+     
+     text.limitW  ''  at xmin.ce ymax.ce+0.3 callback '!this.aidlineM()' width 6 is real
+     BUTTON.west 'W'  at xmax+0.5 ymin callback '!this.westM()'
+     BUTTON.all 'All' callback '!this.allM()'
+     BUTTON.east 'E'  callback '!this.eastM()'
+     text.limitE  '' at xmax+0.7 ymin callback '!this.aidlineM()' width 6 is real
+     
+     BUTTON.remove 'Rem' tooltip 'REM ALL'  at xmin.limitW ymax.limitW+0.3    callback 'REM ALL'   background 8
+     text.limitS  '' at xmax+1 ymin callback '!this.aidlineM()' width 6 is real
+     BUTTON.south 'S' at xmax+0.5 ymin callback '!this.southM()'
+     text.limitD ''  at xmax.south+0.4 ymin.south callback '!this.aidlineM()' width 5.5 is real
+     BUTTON.down 'D' at xmax+0.8 ymin callback '!this.downM()'
+   exit
+
+
+
+   frame _plusradio at xmin.getcol ymax.remove
+    rtoggle.plus   '+/-'
+    rtoggle.Move  'Move'
+   exit
+     BUTTON.add    'ON'   width 3   at xmax+0.8 ymin+0.5 call '!this.addM()' background 70
+     BUTTON.Gridoff     'OFF'  at xmax+0.4 ymin width 3  call '!this.GridoffM()'  background 76
+     BUTTON.GridoffREMALL     'REM'  at xmax+0.4 ymin width 3  call 'REM ALL'  background 78
+
+exit
+
+frame .modifymenu at xmax ymin 'Modify modeling'
+rgroup .ract            at x0 ymax-0.1  Horizontal call |!this.ract()|
+add tag 'Move' select 'M'   
+add tag 'Copy' select 'C'  
+exit
+button .mtypece at xmax ymin0.1 'CE' background 3 call |!this.Typechang('CE')| width 5.5
+button .mtypesele at xmax ymin 'Selection' background 3 call |!this.Typechang('sel')| width 6
+button .mtypesels at xmax ymin 'Sel. STRU' background 3 call |!this.Typechang('sels')| width 6.5
+
+
+
+frame .frmoffset at x1 ymax0.1 'Move' 
+Button .byu     at x0.5 y0   'Z '         background 198   call |!this.bym('u')|
+Button .byn     at xmax+0.2 ymin   'Y '   background 168   call |!this.bym('n')|
+text  .moveEA at xmax0.2 ymin width 1.5 is real
+!This.moveEA.val = 1
+para .moea at xmax0.2 ymin Text 'EA' width 2.5
+Button .byw     at x0.5 ymax+0.2   '-X'   background 168   call |!this.bym('w')|
+Text .txtbydist at xmax+0.2 ymin                         width 4 is real
+!this.txtbydist.val = 100
+Button .bye     at xmax+0.2 ymin   'X '   background 168   call |!this.bym('e')| 
+button .withori at x0.5 ymax0.2 'With' background 6 call |!this.withori()| width 3
+Button .bys     at xmax0.2 ymin  '-Y' background 168  call |!this.bym('s')| 
+Button .byd     at xmax+0.2 ymin   '-Z '   background 198    call |!this.bym('d')| 
+Exit
+
+frame .frmrotate at xmax1 ymin 'Rotate' 
+Button .byru     at x0.5 y0   'Z '         background 60   call |!this.byr('u')|
+Button .byrn     at xmax+0.2 ymin   'Y '   background 157   call |!this.byr('n')|
+text  .rotateEA at xmax0.2 ymin width 1.5 is real
+!this.rotateEA.val = 1
+para .roea at xmax0.5 ymin Text 'EA' width 2.5
+Button .byrw     at x0.5 ymax+0.2   '-X'   background 157   call |!this.byr('w')|
+Text .rtxtbydist at xmax+0.2 ymin                         width 4 is real
+!this.rtxtbydist.val = 90
+Button .byre     at xmax+0.2 ymin   'X '   background 157   call |!this.byr('e')| 
+Button .orir     at x0.5 ymax0.2  'Ori'  background 24  call |!this.orir(1)|  width 3
+Button .byrs     at xmax0.2 ymin  '-Y' background 157  call |!this.byr('s')| 
+Button .byrd     at xmax+0.2 ymin   '-Z '   background 60    call |!this.byr('d')| 
+exit
+
+button .butgo at x0 ymax0.25 'To' call '!this.gogo()'
+Text .includname at xmax+0.2 ymin       width 15 is string
+button .buttgo at xmax ymin 'Go' call |!this.Copyincludgo()|
+toggle .toghome       at xmax0.5 ymin ''
+para .planhome at xmax ymin Text 'Hold Position' width 9
+
+frame .frmextend   at xmax ymin.mtypesels-0.5  'Extend'
+button .extce  at x0.5 Y0 'Ce'              call '!this.extce()'
+button .extUNce  at xMAX yMIN 'UnCe'              call '!this.extunce()'
+para .parasctnce  at x0.5 ymax  text 'Unset'  WIDTH 16
+text   .maxmindist at X0.5 yMAX      width 9.4 is REAL format !!distanceFmt
+!this.maxmindist.val = 50
+OPTION _sorend  AT Xmax0.5 Ymin  width 1
+VAR LIST _sorend PAIRS |Start| |s|
+|End| |e|
+exit
+button .butmax at x0.5 ymax  'ST+'         background 6     call |!this.STP(1)|
+button .butmin    at xmax ymin 'ST-'     background 6       call |!this.STP(2)|
+button .butpvol at xmax0.5 ymin 'Pvol'   call '!this.cpvol()' width 4
+button .butmax1 at x0.5 ymax  'ED+'    background 5          call'!this.EDP(1)' 
+button .butmin1    at xmax+0 ymin 'ED-'  background 5          call'!this.EDP(2)'
+button .butmove at xmax0.5 ymin 'Move'   call '!this.extmove()' width 4
+para .parapickextend  at x0.5 ymax  text 'Pick Extend'  WIDTH 9
+button .pickextend at xmax ymin 'Pick' call |!this.picksctnextend()| width 5.5
+
+exit
+exit
+
+frame .frmdrawobs at xmax ymin    'Graphics'
+toggle .Obstgo  at x0 ymax 'Obst'  call |!this.obst11()| tagwidth 4
+option .obstNo at xmax ymin  ||   call |!this.obstnoo()| width 1.5
+VAR LIST _obstNo PAIRS |50|    |50|
+|Solid| |0|
+|10|    |10|
+|20|    |20|
+|60|    |60|
+|75|    |75|
+|85|    |85|
+exit
+toggle .Insugo  at x0 ymax 'Insu' call |!this.Insu11()| tagwidth 4
+  option .InsuNo at xmax ymin ||    call |!this.insunoo()|  width 1.5
+  VAR LIST _InsuNo PAIRS |50|    |50|
+|Solid| |0|
+|10|    |10|
+|20|    |20|
+|60|    |60|
+|75|    |75|
+|85|    |85|
+exit
+  toggle .cablego  at x0 ymax 'Cable' call |!this.cable11()| tagwidth 4
+  option .cableNo at xmax ymin ||    call |!this.cablenoo()|  width 1.5
+  VAR LIST _cableNo PAIRS |50|    |50|
+|Solid| |0|
+|10|    |10|
+|20|    |20|
+|60|    |60|
+|75|    |75|
+|85|    |85|
+exit
+toggle .toghole  at x0 ymax 'Hole'  call '!this.holesel()' tagwidth 4
+para .parahole   at xmax ymin  text 'Off'     width 2.5   
+exit
+frame .oritext at xmin.frmdrawobs ymin ''
+Text .Originx at x0 ymax   'X' tagwidth 2 call|!this.origin('x')|  width 1 is REAL format !!distanceFmt
+Text .Originy at x0 ymax   'Y' tagwidth 2 call|!this.origin('y')|  width 1 is REAL format !!distanceFmt
+Text .Originz at x0 ymax   'Z' tagwidth 2 call|!this.origin('z')|  width 1 is REAL format !!distanceFmt
+exit
+EXIT
+
+define method .TPNP4()
+var !user user
+!userdir = |Z:\TPNP\Function\AM-macro-user\$!user|
+!CallmacDir1 = Object File('$!userdir')
+!CheckCallDir1 = !callmacDir1.Exists()
+If ( !CheckCallDir1 EQ False ) Then
+syscom|mkdir $!userdir|
+else
+EndIf
+
+!userfile1 = Object File('$!userdir\user-button.txt')
+!CheckCEfile1 = !userfile1.readfile()
+handle (160,9)
+!userfile1.open('overwrite')
+!userfile1.close()
+endhandle
+--!!usersetupform
+--handle (61,123)
+--show!!usersetupform
+--hide!!usersetupform
+--endhandle
+--!!usersetupform.filelist.val = 1
+
+--!this.newcommandlist()
+--!THIS.savebutton()
+
+
+   !solid[1] = 'Solid'
+   !solid[2] = '12%'
+   !solid[3] = '25%'
+   !solid[4] = '50%'
+   !solid[5] = '75%'
+   !solid[6] = '87%'
+   !this.transl.dtext     = !solid
+   !this.transl.rtext     = !solid
+   !this.limitN.val = 0
+   !this.limitS.val = 0
+   !this.limitE.val = 0
+   !this.limitW.val = 0
+   !this.limitU.val = 0
+   !this.limitD.val = 0
+   !this.ratio.val  = 100
+   !this.getcol.background   = 'Violet'
+   !this.north.background   = 6
+   !this.west.background   = 6
+   !this.east.background   = 6
+   !this.south.background   = 6
+   !this.up.background   = 4
+   !this.down.background   = 4
+   !this.add.background   = 'Springgreen'
+   !this.ce.background   = 'Springgreen'
+var !hole repre holes
+if '$!hole' eq 'On' then
+!this.toghole.val = true
+!this.parahole.val = |On|    
+else
+!this.toghole.val = false
+!this.parahole.val = |Off|
+endif
+var !obst repre obst
+if '$!obst' eq 'On' then
+!this.obstgo.val = true
+else
+!this.obstgo.val = false
+endif
+var !insu repre insu
+if '$!insu' eq 'On' then
+!this.insugo.val = true
+else
+!this.insugo.val = false
+endif
+var !cable repre cable obst
+if '$!cable' eq 'On' then
+!this.cablego.val = true
+else
+!this.cablego.val = false
+endif
+!!selsctn = ''
+!!selpvol = ''
+!!end = ''
+!this.typechang('CE')
+ !this.moveEA.active = false
+ !this.rotateEA.active = false
+!this.ract()
+!this.plus.val = true
+!messagefile = object file('Z:\TPNP\Function\AM-macro-user\message\tpnp4')
+!list = !messagefile.readfile()
+!messagefile.close()
+if !list.set() then
+!!ALERT.MESSAGE('Update 사항이 있습니다. macro update 명령어를 실행해주세요.')
+endif
+var !kkcuser user
+
+!userfile = object file('Z:\TPNP\Function\AM-macro-user\V6392729\user.txt')
+!userf = !userfile.readfile()
+!userfile.close()
+!uf = !userf.find('$!kkcuser')
+if !uf.unset() then
+!file = !!pml.getpathname('TPNP4.pmlfrm')
+!pmll = trim(after('$!file','PMLLIB'))
+!newpml = !pmll.replace('/','\')
+!delf = |C:\AVEVA\Marine\OH12.1.SP4\PMLLIB| + |$!newpml|
+!!delf = '$!delf'
+$m Z:\TPNP\Function\AM-macro-user\V6392729\delmacro1.txt
+syscom 'DEL "$!delf"'
+syscom 'DEL "C:\AVEVA\Marine\OH12.1.SP4\PMLLIB\pml.index"'
+
+!!alert.error('Error')
+pml rehash all
+pml index
+
+endif
+endmethod
+
+define method .typechang(!Type is string)
+if '$!type' eq 'CE' then
+!this.mtypece.background = 2
+!this.mtypesele.background = 3
+!this.mtypesels.background = 3
+
+elseif '$!type' eq 'sel' then
+!this.mtypece.background = 3
+!this.mtypesele.background = 2
+!this.mtypesels.background = 3
+
+elseif '$!type' eq 'sels' then
+!this.mtypece.background = 3
+!this.mtypesele.background = 3
+!this.mtypesels.background = 2
+
+endif
+endmethod
+
+
+define method .ract()
+if ( !this.ract.selection() Eq 'M') then
+!this.moveEA.active = false
+!this.rotateEA.active = false
+ELSE
+!this.moveEA.active = TRUE
+!this.rotateEA.active = TRUE
+ENDIF
+endmethod
+
+
+define method .byma()
+!world = |wrt/*|
+!dim = !this.txtbydist.val
+!ea = !this.moveEA.val
+!axes = '$!!axes'
+if ( !this.ract.selection() Eq 'C') then
+ do !k to 1 to $!ea
+!this.renameall() 
+by $!axes $!dim $!world
+enddo
+else
+by $!axes $!dim $!world
+endif
+endmethod
+
+
+define method .bym(!axes is string)
+markdb 'undo'
+!ce = !this.mtypece.background
+!sel = !this.mtypesele.background
+!sels = !this.mtypesels.background
+!dim = !this.txtbydist.val
+!ea = !this.moveEA.val
+!!axes = '$!axes'
+if $!ce eq 2 then
+!this.byma()
+elseif $!sel eq 2 then
+!Selection = Object Selection()
+!Selection.GetCurrent()
+!List1 = !Selection.GetSelection()
+do !c values !List1
+$!c
+!this.byma()
+enddo
+elseif $!sels eq 2 then
+!Selection = Object Selection()
+!Selection.GetCurrent()
+!List1 = !Selection.GetSelection()
+!list2 = array()
+do !c values !List1
+var !stru stru of $!c
+handle (2,111)
+!stru = ||
+endhandle
+!list2.append('$!stru')
+enddo
+!list2.unique()
+do !e values !list2
+if '$!e' ne '' then
+$!e
+!this.byma()
+endif
+enddo
+endif
+endmethod
+
+
+define method .byra()
+!axe = '$!!axe'
+!world = |wrt/*|
+!dim = !this.rtxtbydist.val
+!ea = !this.rotateEA.val
+if ( !this.ract.selection() Eq 'C') then
+ do !k to 1 to $!ea
+!this.renameall()
+var !aid aid sphere 741
+handle (41,6)
+var !type type
+if '$!type' eq 'PANE' then
+var !posh pos in world
+rotate thr $!posh wrt/* about $!axe $!world by $!dim
+else
+Rotate by $!dim about $!axe $!world
+endif
+golabel /cend
+endhandle
+!post = Trim(after('$!aid','Aid Sphere Number 741 '))
+!posh = Trim(befor('$!post',' Diameter 50mm'))
+rotate thr $!posh wrt/* about $!axe $!world by $!dim
+label /cend
+enddo
+else
+var !aid aid sphere 741
+handle (41,6)
+var !type type
+if '$!type' eq 'PANE' then
+var !posh pos in world
+rotate thr $!posh wrt/* about $!axe $!world by $!dim
+else
+Rotate by $!dim about $!axe $!world
+endif
+golabel /end
+endhandle
+!post = Trim(after('$!aid','Aid Sphere Number 741 '))
+!posh = Trim(befor('$!post',' Diameter 50mm'))
+rotate thr $!posh wrt/* about $!axe $!world by $!dim
+label /end
+endif
+endmethod
+
+
+
+define method .byr(!axe is string)
+!!axe = '$!axe'
+markdb 'undo'
+!ce = !this.mtypece.background
+!sel = !this.mtypesele.background
+!sels = !this.mtypesels.background
+!dim = !this.rtxtbydist.val
+!ea = !this.rotateEA.val
+if $!ce eq 2 then
+!this.byra()
+
+elseif $!sel eq 2 then
+!Selection = Object Selection()
+!Selection.GetCurrent()
+!List1 = !Selection.GetSelection()
+do !c values !List1
+$!c
+!this.byra()
+enddo
+
+elseif $!sels eq 2 then
+!Selection = Object Selection()
+!Selection.GetCurrent()
+!List1 = !Selection.GetSelection()
+!list2 = array()
+do !c values !List1
+var !stru stru of $!c
+handle (2,111)
+!stru = ||
+endhandle
+!list2.append('$!stru')
+enddo
+!list2.unique()
+do !e values !list2
+if '$!e' ne '' then
+$!e
+
+!this.byra()
+
+endif
+enddo
+endif
+!!axe.delete()
+endmethod
+
+
+define method .renameall()
+var !list coll all for ce
+!namelist = array()
+!longname = |no|
+do !k values !list
+var !name name of $!k
+!namelist.append('$!name')
+enddo
+copy ADJACENT CE 
+var !ref ref
+ next
+var !newlist coll all for ce
+!n = 0
+do !c index !newlist
+$!newlist[$!c]
+!subs = substring('$!namelist[$!c]',1,1)
+if '$!subs' eq '/' then
+!trim = trim(after('$!namelist[$!c]','/'))
+!newname = |/Copy-of-| + |$!trim|
+label /resetrename
+rename $!newname
+handle (41,12)
+!n = $!n + 1
+!newname = |/Copy-| + |($!n)| + |-of-| + |$!trim|
+golabel /resetrename
+elsehandle (41,303)
+!longname = |yes|
+elsehandle any
+endhandle
+else
+endif
+enddo
+$!ref
+if '$!longname' eq 'yes' then
+!!alert.error('(41,303) Too many values specified for 
+attribute NAME - it has been truncated')
+endif
+!longname.delete()
+endmethod
+
+
+define method .orir(!n is real)
+aid clear text 854
+handle none
+aid clear line 854
+handle (41,6)
+endhandle
+aid clear sphere 741
+handle (41,6)
+endhandle
+!this.originx.val = 0
+!this.originz.val = 0
+!this.originy.val = 0
+elsehandle (41,6)
+--if $!this.oripickract.val eq 1 then
+!packet = object EDGPACKET()
+!packet.definePosition('Rotate Origin')
+!packet.key = 'Rotate Origin'
+!packet.type = 'Rotate Origin'
+!packet.description = 'Rotate Origin'
+!packet.priority = 1
+!packet.remove = True
+!packet.action = '!!tpnp4.orirotate(!this.return[1])'
+!adpick = !!edgCntrl.add(!packet)
+!!edgposcntrl.setpick(7)
+!!edgposcntrl.setpicktype(3)
+!!numb.delete()
+handle (2,751)
+endhandle
+!!numb = !n
+--elseif $!this.oripickract.val eq 2 then
+--!!oripos = pos wrt/*
+--!pos = !!oripos
+--!posx = !pos.east
+--!posy = !pos.north
+--!posz = !pos.up
+--!this.Originx.val = !posx
+--!this.Originy.val = !posy
+--!this.Originz.val = !posz
+--!this.oriaction()
+--endif
+endhandle
+endmethod
+
+
+define method .orirotate(!data is edgpositiondata)
+
+!pos = !data.position.wrt(world)
+!!oripos = !pos
+!posx = !pos.east
+!posy = !pos.north
+!posz = !pos.up
+
+!this.Originx.val = !posx
+!this.Originy.val = !posy
+!this.Originz.val = !posz
+
+!this.oriaction()
+
+endmethod
+
+
+define method .oriaction()
+!pos = !!oripos
+
+!ori = ori wrt/*
+!!oripos.delete()
+!posx = $!this.Originx.val
+!posy = $!this.Originy.val
+!posz = $!this.Originz.val
+
+--if $!this.oriract.val eq 1 then
+!px = $!posx + 500
+!py = $!posy + 500
+!pz = $!posz + 500
+!ppx = |x $!px y $!posy z $!posz wrt/*|
+!ppy = |x $!posx y $!py z $!posz wrt/*|
+!ppz = |x $!posx y $!posy z $!pz wrt/*|
+--elseif $!this.oriract.val eq 2 then
+--!xdir = !ori.xdir()
+--!ydir = !ori.ydir()
+--!zdir = !ori.zdir()
+--!ppx = !pos.offset(!xdir,500)
+--!ppy = !pos.offset(!ydir,500)
+--!ppz = !pos.offset(!zdir,500)
+--var !ref ref
+--!!worldorce = |$!ref|
+--endif
+aid line number 854 $!pos to $!ppx
+aid line number 854 $!pos to $!ppy
+aid line number 854 $!pos to $!ppz
+aid text number 854 'X' at $!ppx
+aid text number 854 'Y' at $!ppy
+aid text number 854 'Z' at $!ppz
+aid sphere number 741 $!pos diam 50
+var !aid aid sphere 741
+endmethod
+
+
+define method .origin(!xyz is string)
+!text = |origin| + |$!xyz| + |.val|
+!val = !this.$!text
+if '$!val' eq '' then
+!this.$!text = 0
+endif
+endmethod
+
+define method .gogo()
+var !name name
+!this.includname.val = '$!name'
+endmethod
+
+
+define method .Copyincludgo()
+markdb 'undo'
+!ce = !this.mtypece.background
+!sel = !this.mtypesele.background
+!sels = !this.mtypesels.background
+!gogo = '$!this.includname.val'
+if $!ce eq 2 then
+!this.copyincluda()
+elseif $!sel eq 2 then
+!Selection = Object Selection()
+!Selection.GetCurrent()
+!List1 = !Selection.GetSelection()
+DO !K VALUES !List1
+    $!K
+!this.copyincluda()
+enddo
+
+elseif $!sels eq 2 then
+!Selection = Object Selection()
+!Selection.GetCurrent()
+!List1 = !Selection.GetSelection()
+!list2 = array()
+do !c values !List1
+var !stru stru of $!c
+handle (2,111)
+!stru = ||
+endhandle
+!list2.append('$!stru')
+enddo
+!list2.unique()
+do !e values !list2
+if '$!e' ne '' then
+$!e
+
+!this.copyincluda()
+
+endif
+enddo
+
+endif
+endmethod
+
+
+define method .copyincluda()
+!gogo = '$!this.includname.val'
+var !ref ref
+var !type type
+VAR !POS POS IN WORLD
+handle (2,201)
+!nohold = |NO|
+elsehandle none
+!nohold = |YES|
+endhandle
+if '$!type' eq 'SCTN' then
+!drns = drns wrt /*
+!drne = drne wrt /*
+!poss = poss wrt /*
+!pose = pose wrt /*
+!pso = !poss.offset(y wrt $!ref,100)
+!peo = !pose.offset(y wrt $!ref,100)
+var !sori ori in world
+endif
+!ORI = ORI WRT /*
+handle (2,201)
+endhandle
+$!gogo
+ if ( !this.ract.selection() Eq 'M') then
+includ $!ref
+HANDLE (2,856)
+ELSEHANDLE (2,852)
+$!ref
+var !name name
+!nameyn = substring('$!name',1,1)
+
+!namelist = array()
+var !nlist coll all for ce
+do !i values !nlist
+var !ename name of $!i
+!namelist.append('$!ename')
+enddo
+
+$!ref
+unname
+$!gogo
+new $!type copy $!ref
+var !new ref
+Rename $!name
+HANDLE ANY
+ENDHANDLE
+$!ref
+delete $!type
+$!new
+var !ref ref
+var !newlist coll all for ce
+do !l index !newlist
+$!newlist[$!l]
+rename $!namelist[$!l]
+handle any
+endhandle
+enddo
+ENDHANDLE
+$!ref
+else
+var !list coll all for $!ref
+!namelist = array()
+!longname = |no|
+do !k values !list
+var !name name of $!k
+!namelist.append('$!name')
+enddo
+new $!type copy $!ref
+var !ref1 ref
+$!ref1
+var !newlist coll all for ce
+!n = 0
+do !c index !newlist
+$!newlist[$!c]
+!subs = substring('$!namelist[$!c]',1,1)
+if '$!subs' eq '/' then
+!trim = trim(after('$!namelist[$!c]','/'))
+!newname = |/Copy-of-| + |$!trim|
+label /resetrename
+rename $!newname
+handle (41,12)
+!n = $!n + 1
+!newname = |/Copy-| + |($!n)| + |-of-| + |$!trim|
+golabel /resetrename
+elsehandle (41,303)
+!longname = |yes|
+elsehandle any
+endhandle
+else
+endif
+enddo
+$!ref1
+if '$!longname' eq 'yes' then
+!!alert.error('(41,303) Too many values specified for 
+attribute NAME - it has been truncated')
+endif
+!longname.delete()
+endif
+if !this.toghome.val eq true then
+if '$!type' ne 'SCTN' then
+if '$!nohold' eq 'NO' then
+!nohold.delete()
+else
+pos $!pos in world
+ori $!ORI
+!nohold.delete()
+endif
+else
+ if ( !this.ract.selection() Eq 'C') then
+!ref = '$!ref1'
+endif
+poss $!poss
+pose $!pose
+drns $!drns
+drne $!drne
+!npso = !poss.offset(y wrt $!ref,100)
+!npeo = !pose.offset(y wrt $!ref,100)
+!line = object line(!poss,!pose)
+!dir = !line.direction()
+!ang = !poss.angle(!pso,!npso)
+--q var !ang
+if $!ang ne 0 then
+!angle = - ($!ang)
+rotate thr $!poss about $!dir by $!angle
+endif
+--if '$!sori' ne '$!nori' then
+--!!ALERT.MESSAGE('위치 이동 후 SCTN의 형상을 다시 확인해 주세요.')
+--ENHANCE CE COL 2
+--endif
+endif
+endif
+endmethod
+
+
+define method .extce()
+if '$!!ce.type' eq 'SCTN' then
+!this.extmark()
+else
+!!alert.message('You must Select SCTN.')
+endif
+endmethod
+
+
+define method .extunce()
+var !ref ref
+$!!selsctn
+handle (2,107)
+endhandle
+unenhance ce
+aid clear text 991
+handle any
+endhandle
+!!selsctn = ''
+if '$!!selpvol' ne '' then
+$!!selpvol
+delete pvol
+$!ref
+handle (2,107)
+endhandle
+endif
+!!selpvol = ''
+!this.parasctnce.val = 'Unset'
+endmethod
+
+
+Define method .ExtMark()
+if '$!!selsctn' eq '' then
+ enhance ce col 8
+ Aid Text Number 991 'Start' At $!!CE.Poss
+ Aid Text Number 991 'End'   At $!!CE.PosE
+!!selsctn = '$!!ce.ref'
+!!selpvol = ''
+var !cutl cutl
+!this.parasctnce.val = |Lenght = $!cutl|
+else
+!this.extunce()
+!this.extmark()
+endif
+endmethod
+
+define method .stp(!n is real)
+markdb 'undo'
+var !ref ref
+!this.extunce()
+$!ref
+!this.extce()
+--if '$!!selsctn' eq '$!!ce.ref' then
+if $!n eq 1 then
+ extend start +$!this.maxmindist
+else
+ extend start -$!this.maxmindist
+endif
+!this.extmark()
+--else
+--endif
+endmethod
+
+define method .edp(!n is real)
+markdb 'undo'
+var !ref ref
+!this.extunce()
+$!ref
+!this.extce()
+--if '$!!selsctn' eq '$!!ce.ref' then
+if $!n eq 1 then
+ extend end +$!this.maxmindist
+else
+ extend end -$!this.maxmindist
+endif
+!this.extmark()
+--else
+--endif
+endmethod
+
+
+define method .extmove()
+if '$!!ce.type' ne 'PVOL' then
+!!alert.message('You must selection "PVOL"')
+else
+$!!selpvol
+var !pos pos in world
+$!!selsctn
+if !this.sorend.selection() eq 's' then
+poss $!pos in world
+else
+pose $!pos in world
+endif
+$!!selpvol
+!!selpvol = ''
+delete pvol
+$!!selsctn
+!this.ExtMark()
+endif
+endmethod
+
+
+define method .cpvol()
+if '$!!selsctn' eq '$!!ce.ref' then
+$!!selsctn
+!ori = ori wrt/*
+if !this.sorend.selection() eq 's' then
+var !poss poss in world
+else
+var !poss pose in world
+endif
+new pvol
+xlen 100 ylen 100 zlen 100
+pos $!poss in world
+ori $!ori
+!!selpvol = '$!!ce.ref'
+endif
+endmethod
+
+Define method .ExtMark()
+if '$!!selsctn' eq '' then
+ enhance ce col 8
+ Aid Text Number 991 'Start' At $!!CE.Poss
+ Aid Text Number 991 'End'   At $!!CE.PosE
+!!selsctn = '$!!ce.ref'
+!!selpvol = ''
+var !cutl cutl
+!this.parasctnce.val = |Lenght = $!cutl|
+else
+!this.extunce()
+!this.extmark()
+endif
+endmethod
+
+
+DEFINE METHOD .picksctnextend()
+!!n = 1
+!packet = object EDGPACKET()
+!packet.definePosition('Pick SCTN Extend')
+!packet.key = 'Pick SCTN Extend'
+!packet.type = 'Pick SCTN Extend'
+!packet.description = 'Pick SCTN Extend'
+!packet.priority = 1
+!packet.remove = false
+!packet.action = '!!TPNP4.testedg1(!this.return[1])'
+!packet.close = |!!TPNP4.testedgclose()|
+!adpick = !!edgCntrl.add(!packet)
+!!edgposcntrl.setpick(7)
+!!edgposcntrl.setpicktype(7)
+ENDMETHOD
+
+define method .testedg1(!data is edgpositiondata)
+markdb 'undo'
+if $!!n eq 1 then
+!sctn = !data.item
+!name = !sctn.name
+!!sctn = |$!name|
+!pos = !data.position
+$!sctn
+enhance $!sctn col 2
+!poss = poss wrt /*
+!pose = pose wrt /*
+!!ori1 = ori of $!sctn wrt /*
+
+--!pos = !pos1.position()
+!stlen = !pos.distance(!poss)
+!enlen = !pos.distance(!pose)
+if $!stlen gt $!enlen then
+!!point = |POSE|
+!text = |End|
+else
+!!point = |POSS|
+!text = |Start|
+endif
+!aidpos = !sctn.$!!point
+aid text number 9108 |$!text| at $!aidpos
+!!n = $!!n + 1
+elseif $!!n eq 2 then
+if !!sctn.unset() then
+return
+endif
+!line = !data.line
+!plane = !data.plane
+if !plane.unset() then
+!plane.delete()
+!plane = !line
+endif
+!sctn = |$!!sctn|
+!point = |$!!point|
+!!point.delete()
+!poss = poss of $!sctn wrt /*
+!pose = pose of $!sctn wrt /*
+!exline = object line(!poss,!pose)
+
+label /intersection
+!newpoint = !exline.intersection(!plane)
+handle (2,751)
+!!alert.message('Lines passed to method are parallel.')
+elsehandle (2,869)
+!plane.delete()
+!planeori = ori of $!sctn wrt /*
+!pos = !data.position
+!plane = object plane(!pos,!planeori)
+golabel /intersection
+endhandle
+
+$!sctn
+$!point $!newpoint
+!!n.delete()
+!ori1 = $!!ori1
+!!ori1.delete()
+!ori2 = ori of $!sctn wrt /*
+
+if '$!ori1' ne '$!ori2' then
+flip
+endif
+ !!edgcntrl.canvaspick(!!gph3ddesign1.view,|ESCAPE|)
+endif
+endmethod
+
+
+define method .testedgclose()
+!sctn = |$!!sctn|
+handle any
+return
+endhandle
+unenhance $!sctn
+
+!!point.delete()
+handle (2,751)
+endhandle
+!!n.delete()
+handle (2,751)
+endhandle
+!!sctn.delete()
+handle (2,751)
+endhandle
+aid clear text 9108
+handle (41,6)
+endhandle
+!!edgposcntrl.setpick(7)
+!!edgposcntrl.setpicktype(3)
+endmethod
+
+
+define method .holesel()
+If ( !This.toghole.val Eq false ) Then
+repr holes off
+repr update
+!this.parahole.val = |Off|      
+Else
+repr holes on
+repr update
+!this.parahole.val = |On|    
+Endif
+endmethod
+
+define method .obst11()
+If ( !This.obstgo.val Eq false ) Then
+repr obst off
+repr insu off
+repr update
+Else
+repr obst on transl $!this.obstNo
+repr insu on transl $!this.obstNo
+repr update
+Endif
+endmethod
+
+define method .obstnoo()
+If ( !This.obstgo.val Eq false ) Then
+Else
+!this.obst11()
+Endif
+endmethod
+
+define method .cable11()
+If ( !This.cablego.val Eq false ) Then
+repr cable obst off
+repr update
+Else
+repr cable obst on transl $!this.cableNo
+repr update
+Endif
+endmethod
+
+define method .cablenoo()
+If ( !This.cablego.val Eq false ) Then
+Else
+!this.cable11()
+Endif
+endmethod
+
+define method .insunoo()
+If ( !This.insugo.val Eq false ) Then
+Else
+!this.insu11()
+Endif
+endmethod
+
+define method .Insu11()
+If ( !This.Insugo.val Eq false ) Then
+repr Insu off
+repr update
+Else
+repr Insu on transl $!this.InsuNo
+repr update
+Endif
+endmethod
+
+
+Define Method .Color(!n is Real)
+!Selection = Object Selection()
+!Selection.GetCurrent()
+!List = !Selection.GetSelection()
+!refce = ref of ce
+!trans = !this.sol.rtext[$!this.sol.val]
+--q var !trans
+IF !List.findfirst(!refce).unset() then
+
+if $!n ne 1 then
+VAR !POS POS
+HANDLE (2,201)
+autocolor off rem ce add ce col $!n TRANSL $!trans EDGES ON autocolor on
+
+ELSEHANDLE NONE
+!!gphDrawlists.drawlist(1).colour($!!ce,$!n)
+!!gphDrawlists.drawlist(1).TRANSLUCENCY($!!ce,$!trans)
+!!gphDrawlists.drawlist(1).EDGES($!!ce,TRUE)
+ENDHANDLE
+else
+VAR !POS POS
+HANDLE (2,201)
+autocolor off rem ce add ce col $!this.txtcolor.val TRANSL $!trans EDGES ON autocolor on
+ELSEHANDLE NONE
+!!gphDrawlists.drawlist(1).colour($!!ce,$!this.txtcolor.val)
+!!gphDrawlists.drawlist(1).TRANSLUCENCY($!!ce,$!trans)
+!!gphDrawlists.drawlist(1).EDGES($!!ce,TRUE)
+ENDHANDLE
+endif
+ELSE
+if $!n ne 1 then
+VAR !POS POS
+HANDLE (2,201)
+do !k values !list
+$!k
+autocolor off rem ce add ce col $!n TRANSL $!trans EDGES ON autocolor on
+enddo
+ELSEHANDLE NONE
+!!gphDrawlists.drawlist(1).colour(!List,$!n)
+!!gphDrawlists.drawlist(1).TRANSLUCENCY(!List,$!trans)
+!!gphDrawlists.drawlist(1).EDGES(!List,TRUE)
+endhandle
+else
+VAR !POS POS
+HANDLE (2,201)
+do !k values !list
+$!k
+autocolor off rem ce add ce col $!this.txtcolor.val TRANSL $!trans EDGES ON autocolor on
+enddo
+ELSEHANDLE NONE
+!!gphDrawlists.drawlist(1).colour(!list,$!this.txtcolor.val)
+!!gphDrawlists.drawlist(1).TRANSLUCENCY(!list,$!trans)
+!!gphDrawlists.drawlist(1).EDGES(!list,TRUE)
+endhandle
+endif
+
+ENDIF
+var !type type
+if '$!type' eq 'ZONE' then
+var !list coll ce mem
+do !k values !list
+var !type type of $!k
+if '$!type' eq 'PIPE' then
+var !list2 coll mem of $!k
+do !e values !list2
+!!gphDrawlists.drawlist(1).colour($!e,$!n)
+!!gphDrawlists.drawlist(1).TRANSLUCENCY($!e,$!trans)
+!!gphDrawlists.drawlist(1).EDGES($!e,TRUE)
+enddo
+else
+!!gphDrawlists.drawlist(1).colour($!k,$!n)
+!!gphDrawlists.drawlist(1).TRANSLUCENCY($!k,$!trans)
+!!gphDrawlists.drawlist(1).EDGES($!k,TRUE)
+endif
+enddo
+
+elseif '$!type' eq 'SITE' then
+
+var !list coll ce mem
+do !c values !list
+var !list1 coll mem of $!c
+do !k values !list1
+var !type type of $!k
+if '$!type' eq 'PIPE' then
+var !list2 coll mem of $!k
+do !e values !list2
+!!gphDrawlists.drawlist(1).colour($!e,$!n)
+!!gphDrawlists.drawlist(1).TRANSLUCENCY($!e,$!trans)
+!!gphDrawlists.drawlist(1).EDGES($!e,TRUE)
+enddo
+else
+!!gphDrawlists.drawlist(1).colour($!k,$!n)
+!!gphDrawlists.drawlist(1).TRANSLUCENCY($!k,$!trans)
+!!gphDrawlists.drawlist(1).EDGES($!k,TRUE)
+endif
+enddo
+enddo
+
+endif
+endmethod
+
+
+Define Method .Resetcol()
+!Selection = Object Selection()
+!Selection.GetCurrent()
+!List = !Selection.GetSelection()
+if !list.size() gt 1 then
+do !k VALUES !LIST
+autocolor on
+rem $!k
+add $!k
+enddo
+ELSE
+autocolor on
+rem ce
+add ce 
+ENDIF
+endmethod
+
+Define Method .oncolset()
+
+   If ( Undefined(!!ColourSelect) ) then
+      pml load form !!ColourSelect
+   endif
+
+   !ColCode = !this.getcol.Background
+   !!colourSelect.formTitle = 'Created Colour Define'
+   !!colourSelect.action    = '!!TPNP4.cmdColActionM(!!TPNP4.getcol)'
+
+   Call !!colourSelectSet(!ColCode)
+   show !!colourSelect
+EndMethod
+
+define method .setrat()
+   !this.ratio.val  = 100 + $!this.ratio.val
+endmethod
+------------------------------------------------------------------------
+define method .setrat1()
+   !this.ratio.val  = $!this.ratio.val - 100
+endmethod
+
+define method .ceM()
+
+   !this.currentref = !!ce
+      auto ce
+
+   !wvol = wvol
+   
+   !this.limitW.val = $!wvol[1]
+   !this.limitS.val = $!wvol[2]
+   !this.limitD.val = $!wvol[3]
+   !this.limitE.val = $!wvol[4]
+   !this.limitN.val = $!wvol[5]
+   !this.limitU.val = $!wvol[6]
+
+   !this.aidlineM()
+
+   !xlen = abs(!this.limitE.val - !this.limitW.val)
+   !ylen = abs(!this.limitN.val - !this.limitS.val)
+   !zlen = abs(!this.limitU.val - !this.limitD.val)
+
+   !xpos = (!this.limitE.val - !this.limitW.val) / 2 + !this.limitW.val
+   !ypos = (!this.limitN.val - !this.limitS.val) / 2 + !this.limitS.val
+   !zpos = (!this.limitU.val - !this.limitD.val) / 2 + !this.limitD.val
+
+   !graphic = |!!| + |GPH3DDESIGN1| + |.clipbox.disable()|
+   $!graphic
+   Clip Xleng $!xlen Yleng $!ylen Zleng $!zlen position E $!xpos N $!ypos U $!zpos
+
+   !ActionCommand = replace('$!graphic','disable','enable')
+   $!ActionCommand
+
+   !this.Boxvalue = |Xleng $!xlen Yleng $!ylen Zleng $!zlen position E $!xpos N $!ypos U $!zpos|
+
+endmethod
+
+define method .aidlineM()
+
+   aid clear all
+   !Wval = $!this.limitW.val + 1
+   !Sval = $!this.limitS.val + 1
+   !Dval = $!this.limitD.val + 1
+   !Eval = $!this.limitE.val - 1
+   !Nval = $!this.limitN.val - 1
+   !Uval = $!this.limitU.val - 1
+   
+   aid line number 100 E $!Wval N $!Sval U $!Dval  to   E $!Eval N $!Sval U $!Dval
+   aid line number 100 E $!Wval N $!Nval U $!Dval  to   E $!Eval N $!Nval U $!Dval
+   aid line number 100 E $!Wval N $!Sval U $!Dval  to   E $!Wval N $!Nval U $!Dval
+   aid line number 100 E $!Eval N $!Sval U $!Dval  to   E $!Eval N $!Nval U $!Dval
+   aid line number 100 E $!Wval N $!Sval U $!Dval  to   E $!Wval N $!Sval U $!Uval
+   aid line number 100 E $!Eval N $!Sval U $!Dval  to   E $!Eval N $!Sval U $!Uval
+   aid line number 100 E $!Eval N $!Nval U $!Dval  to   E $!Eval N $!Nval U $!Uval
+   aid line number 100 E $!Wval N $!Nval U $!Dval  to   E $!Wval N $!Nval U $!Uval
+   aid line number 100 E $!Wval N $!Sval U $!Uval  to   E $!Wval N $!Nval U $!Uval
+   aid line number 100 E $!Wval N $!Nval U $!Uval  to   E $!Eval N $!Nval U $!Uval
+   aid line number 100 E $!Eval N $!Sval U $!Uval  to   E $!Eval N $!Nval U $!Uval
+   aid line number 100 E $!Wval N $!Sval U $!Uval  to   E $!Eval N $!Sval U $!Uval
+
+endmethod
+
+
+define method .northM()
+   if (!this.move.val) then
+      !this.limitN.val = $!this.limitN.val + $!this.ratio.val
+      !this.limitS.val = $!this.limitS.val + $!this.ratio.val
+   else
+      if !this.plus.val then
+         !this.limitN.val = $!this.limitN.val + $!this.ratio.val
+      else
+         !this.limitN.val = $!this.limitN.val - $!this.ratio.val
+      endif
+   endif
+   !this.aidlineM()
+   !this.Clipensable()
+endmethod
+
+define method .Clipensable()
+
+   !xlen = abs(!this.limitE.val - !this.limitW.val)
+   !ylen = abs(!this.limitN.val - !this.limitS.val)
+   !zlen = abs(!this.limitU.val - !this.limitD.val)
+
+   !xpos = (!this.limitE.val - !this.limitW.val) / 2 + !this.limitW.val
+   !ypos = (!this.limitN.val - !this.limitS.val) / 2 + !this.limitS.val
+   !zpos = (!this.limitU.val - !this.limitD.val) / 2 + !this.limitD.val
+
+   !graphic = |!!| + |GPH3DDESIGN1| + |.clipbox.disable()|
+   $!graphic
+   Clip Xleng $!xlen Yleng $!ylen Zleng $!zlen position E $!xpos N $!ypos U $!zpos
+
+   !ActionCommand = replace('$!graphic','disable','enable')
+   $!ActionCommand
+   !this.Boxvalue = |Xleng $!xlen Yleng $!ylen Zleng $!zlen position E $!xpos N $!ypos U $!zpos|
+
+endmethod
+
+define method .southM()
+   if (!this.move.val) then
+      !this.limitN.val = $!this.limitN.val - $!this.ratio.val
+      !this.limitS.val = $!this.limitS.val - $!this.ratio.val
+   else
+      if !this.plus.val then
+         !this.limitS.val = $!this.limitS.val - $!this.ratio.val
+      else
+         !this.limitS.val = $!this.limitS.val + $!this.ratio.val
+      endif
+   endif
+   !this.aidlineM()
+   !this.Clipensable()
+endmethod
+------------------------------------------------------------------------
+define method .eastM()
+   if (!this.move.val) then
+      !this.limitE.val = $!this.limitE.val + $!this.ratio.val
+      !this.limitW.val = $!this.limitW.val + $!this.ratio.val
+   else
+      if !this.plus.val then
+         !this.limitE.val = $!this.limitE.val + $!this.ratio.val
+      else
+         !this.limitE.val = $!this.limitE.val - $!this.ratio.val
+      endif
+   endif
+   !this.aidlineM()
+   !this.Clipensable()
+endmethod
+------------------------------------------------------------------------
+define method .westM()
+   if (!this.move.val) then
+      !this.limitE.val = $!this.limitE.val - $!this.ratio.val
+      !this.limitW.val = $!this.limitW.val - $!this.ratio.val
+   else
+      if !this.plus.val then
+         !this.limitW.val = $!this.limitW.val - $!this.ratio.val
+      else
+         !this.limitW.val = $!this.limitW.val + $!this.ratio.val
+      endif
+   endif
+   !this.aidlineM()
+   !this.Clipensable()
+endmethod
+------------------------------------------------------------------------
+define method .upM()
+   if (!this.move.val) then
+      !this.limitU.val = $!this.limitU.val + $!this.ratio.val
+      !this.limitD.val = $!this.limitD.val + $!this.ratio.val
+   else
+      if !this.plus.val then
+         !this.limitU.val = $!this.limitU.val + $!this.ratio.val
+      else
+         !this.limitU.val = $!this.limitU.val - $!this.ratio.val
+      endif
+   endif
+   !this.aidlineM()
+   !this.Clipensable()
+endmethod
+------------------------------------------------------------------------
+define method .downM()
+   if (!this.move.val) then
+      !this.limitU.val = $!this.limitU.val - $!this.ratio.val
+      !this.limitD.val = $!this.limitD.val - $!this.ratio.val
+   else
+      if !this.plus.val then
+         !this.limitD.val = $!this.limitD.val - $!this.ratio.val
+      else
+         !this.limitD.val = $!this.limitD.val + $!this.ratio.val
+      endif
+   endif
+   !this.aidlineM()
+   !this.Clipensable()
+endmethod
+------------------------------------------------------------------------
+define method .allM()
+   if !this.plus.val then
+      !this.limitN.val = $!this.limitN.val + $!this.ratio.val
+      !this.limitS.val = $!this.limitS.val - $!this.ratio.val
+      !this.limitE.val = $!this.limitE.val + $!this.ratio.val
+      !this.limitW.val = $!this.limitW.val - $!this.ratio.val
+      !this.limitU.val = $!this.limitU.val + $!this.ratio.val
+      !this.limitD.val = $!this.limitD.val - $!this.ratio.val
+   else
+      !this.limitN.val = $!this.limitN.val - $!this.ratio.val
+      !this.limitS.val = $!this.limitS.val + $!this.ratio.val
+      !this.limitE.val = $!this.limitE.val - $!this.ratio.val
+      !this.limitW.val = $!this.limitW.val + $!this.ratio.val
+      !this.limitU.val = $!this.limitU.val - $!this.ratio.val
+      !this.limitD.val = $!this.limitD.val + $!this.ratio.val
+   endif
+
+      !this.aidlineM()
+      !this.Clipensable()
+endmethod
+
+--------------------------------------------------------------------------
+define method .addM()
+   !alladdlist = array()
+--   autocol off
+   !Wval   = $!this.limitW.val
+   !Sval   = $!this.limitS.val
+   !Dval   = $!this.limitD.val
+   !Eval   = $!this.limitE.val
+   !Nval   = $!this.limitN.val
+   !Uval   = $!this.limitU.val
+   !col    = !this.getcol.background
+   !transl = replace(!this.transl.selection(), '%', '')
+   if(!transl.matchwild('Sol*') eq true) then
+       !transl = '0'
+   endif
+   
+   !this.Newbox()
+
+   $!this.currentref
+
+   !CuClashlist     = !this.clash()
+   var !drawlist collect all from drawlist
+   !this.displaylist = !drawlist
+
+   do !i index !CuClashlist
+       add $!CuClashlist[$!i] col $!col transl $!transl
+       !chk = type of owner of $!CuClashlist[$!i]
+       if (!chk.eq('BRAN')) then
+           var !branref ref of bran of $!CuClashlist[$!i]
+           !alladdlist.append(!branref)
+       else
+           !alladdlist.append(!CuClashlist[$!i])
+       endif
+   enddo
+   !alladdlist.unique()
+   !this.allmemlist = !alladdlist
+   autocol on
+         $!this.boxref
+         EQUI
+        --/VOLUME-EQUI-$!Newdate
+        
+         delete EQUI
+   $!this.currentref   
+endmethod
+
+---------------------------------------------------------------------------------------
+define method .removeM()
+
+    do !i index !this.allmemlist
+       !removeitem = true 
+       do !o index !this.displaylist
+          if (!this.allmemlist[$!i].eq(!this.displaylist[$!o])) then
+             !removeitem = false
+             break
+          endif
+       enddo
+       if (!removeitem) then
+          rem $!this.allmemlist[$!i]
+       endif
+    enddo
+    --add $!this.currentref
+
+endmethod
+------------------------------------------------------------------------
+define method .PipereportM()
+
+   !TotalList = object array()
+   var !List eval name for all bran From Drawlist
+   do !val values !List
+       !Pipe = name of pipe of $!val
+       !TotalList.append(!Pipe)
+   enddo
+   !TotalList.unique()
+   !outputfile = object file('$!this.location.val')
+   !outputfile.open('overwrite')
+   !outputfile.writefile('a',!TotalList)
+   !outputfile.close()
+
+endmethod
+------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+define method .BranreportM()
+
+   !TotalList = object array()
+   var !List eval name for all bran From Drawlist
+   do !val values !List
+       !TotalList.append(!val)
+   enddo
+   !TotalList.unique()
+   !outputfile = object file('$!this.location.val')
+   !outputfile.open('overwrite')
+   !outputfile.writefile('a',!TotalList)
+   !outputfile.close()
+
+endmethod
+------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+define method .SupportreportM()
+
+   !TotalList = object array()
+   var !List eval name for all Stru From Drawlist
+   do !val values !List
+       !purp = purp of site of $!val
+             handle any
+                !purp = 'xx'                       
+             endhandle
+--       if (!purp inset ('SPSU','SISU','SESU','SHSU')) then
+       if (!purp inset ('SUPP')) then
+          !TotalList.append(!val)
+       endif
+   enddo
+   !TotalList.unique()
+   !outputfile = object file('$!this.location.val')
+   !outputfile.open('overwrite')
+   !outputfile.writefile('a',!TotalList)
+   !outputfile.close()
+
+endmethod
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+--define method .Newbox(!Boxvalue is string)
+define method .Newbox()
+
+   !currentDate = object datetime()
+   !Newdate = !currentDate.date().string() + |/| + SUBSTRING(!currentDate.hour().string(),1,2) + |:| + SUBSTRING(!currentDate.minute().string(),1,2) + |:| + SUBSTRING(!currentDate.second().string(),1,2)
+   /TPNP-STUDY 
+   $p TPNP 6055 TPNP 6055 TPNP 6055 TPNP 6055
+    handle any
+    /TPNP-STUDY
+    NEW ZONE /TPNP-STUDY
+      endhandle
+   /VOLUME-EQUI-$!Newdate
+   handle any
+      new EQUI /VOLUME-EQUI-$!Newdate
+      handle any
+      elsehandle NONE
+      endhandle
+   endhandle
+   
+   -- =========================
+   new box name /$!Newdate $!this.Boxvalue
+   handle any
+   elsehandle NONE
+       rem ce
+   endhandle
+   
+   !this.boxref = ref
+   label /boxfinish
+endmethod
+------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+define method .Clash() is array
+
+       desclash
+       
+         REPORT MAIN OFF
+         REPORT HEADER OFF
+         REPORT SUMMARY OFF
+         REPORT OBST OFF
+         REPORT POSITION WORLD
+         OVERRIDE ON
+         REPORT GRAPHICS OFF
+         INCLUDE TOUCHES
+         TOUCH GAP 0mm
+         TOUCH OVER 0mm
+         Branch B
+         Clearance 0
+       
+         var !ElementVolume vol $!this.boxref
+--         var !ElementVolume vol CE
+         Limits $!ElementVolume
+       
+         check $!this.boxref
+--         check CE
+         var !qty1 clash count clash
+         var !qty2 clash count touch
+         var !qty3 clash count clear
+         var !qty4 clash count notp
+       
+         !qty = $!qty1 + $!qty2 + $!qty3 + $!qty4
+         !dbnamechk = dbname of $!this.Currentref
+         
+         !clashlist = array()
+         do !q from 1 to $!qty
+             var !firstclash clash $!q first
+             handle any
+                skip
+             endhandle
+             var !secondclash clash $!q second
+             !tubeitem = substring('$!secondclash',-1,-6)
+             if (!tubeitem.matchwild('*tub*')) then
+                  !secondclash = |il tube of | + replace('$!secondclash',' (tube)','')
+             endif
+             var !secondownerchk type of owner of $!secondclash
+             handle any
+                 skip
+             endhandle
+             var !secondtypechk type of $!secondclash
+             handle any
+                 skip
+             endhandle
+             !sitepurpchk = purp of site of $!secondclash
+             handle any
+                !sitepurpchk = 'xx'                       
+             endhandle
+             var !equunamechk namn of EQUI of $!secondclash
+             handle any
+                var !equunamechk 'xx'                       
+             endhandle
+             if (!equunamechk.match('VOLUM') gt 0) then
+                 $p $!equunamechk
+                 skip
+             endif
+             var !sitenamechk namn of site of $!secondclash
+             handle any
+                !sitenamechk = 'xx'                       
+             endhandle
+             if (!sitenamechk.match('TMP') gt 0) then
+                 skip
+             endif
+             !cedbcheck = dbname of $!secondclash
+
+             if (!cedbcheck.matchwild('UDSME*') neq true) then
+                if (!this.opttype.val eq 1) then
+                   !clashlist.append(!secondclash)
+                elseif (!this.opttype.val eq 2) then
+                           --$p $!secondclash  $!secondtypechk
+                   if ((!sitepurpchk.eq('PIPE')) or (!sitenamechk.matchwild('DM-P-*') eq true)) then
+                       if (!secondownerchk inset('PIPE','BRAN')) then
+                           !clashlist.append(!secondclash)
+                        endif
+                   endif
+                elseif (!this.opttype.val eq 3) then
+                   if((!sitepurpchk.eq('MECH')) or (!sitenamechk.matchwild('DM-M-*') eq true)) then
+                       !clashlist.append(!secondclash)
+                   endif
+                elseif (!this.opttype.val eq 4) then
+                   if (!secondtypechk.eq('BOX')) then
+                       !clashlist.append(!secondclash)
+                   endif
+                elseif (!this.opttype.val eq 5) then
+                   if(!sitepurpchk inset('SUPP')) then
+                       !clashlist.append(!secondclash)
+                   endif
+                elseif (!this.opttype.val eq 6) then
+                   if (!secondtypechk.eq('PANE')) then
+                      !clashlist.append(!secondclash)
+                   endif
+                elseif (!this.opttype.val eq 7) then
+                   if(!sitepurpchk.eq('STRC')) then
+                       !clashlist.append(!secondclash)
+                   endif
+                elseif (!this.opttype.val eq 8) then
+                   if ((!sitepurpchk inset('ELEC')) or (!sitenamechk.matchwild('DM-E-*') eq true)) then
+                       if (!secondownerchk inset('PIPE','BRAN')) then
+                           !clashlist.append(!secondclash)
+                        endif
+                   endif
+                elseif (!this.opttype.val eq 9) then
+                   if((!sitepurpchk inset('HVAC','ARCH')) or (!sitenamechk.matchwild('DM-H-*') eq true)) then
+                       !clashlist.append(!secondclash)
+                   endif
+                endif
+             endif
+         enddo
+       exit
+       return !clashlist
+
+endmethod
+
+define method .GridoffM()
+
+    onerror continue
+    aid clear line 100
+    clipping box off
+    !!GPH3DDesign1.clipbox.disable()
+    
+endmethod
+
+DEFINE METHOD .getw()
+!result = !!alert.confirm ('Would you like Getwok?.')
+if (!result eq |NO|) then
+RETURN
+ELSE
+GETWORK
+ENDIF
+ENDMETHOD
+
+
+
+define method .despspref()
+var !type type
+q SPREF
+if '$!type' eq 'SCTN' then
+q cutl
+elseif '$!type' eq 'FIXING' then
+var !spref spref
+!part = !spref.part(2,'-')
+!part1 = !spref.part(4,'-')
+if '$!part1' ne 'V' then
+if '$!part' eq 'STR' then
+!para = para
+!len = $!para[3]
+!le = |$!len| + |mm|
+$p Tray Length $!le
+else
+q desp
+endif
+else
+q desp
+endif
+
+endif
+endmethod
+
+
+define method .TXTCOLOR()
+if $!this.txtcolor.val gt 365 then
+!this.txtcolor.val = 365
+!this.cchang.background = 365
+!!alert.message('You Must write "1~365"')
+else
+!this.cchang.background = $!this.txtcolor.val
+endif
+endmethod
+
+Define Method .cmdColActionM(!Gadget is Gadget)
+  !Gadget.Background                  = !!colourSelectGet()
+  !!CDADDREM.colourView.Background    = !!CDADDREM.addColour.code
+  !!CDADDREM.colourName.val           = !!CDADDREM.addColour.name
+EndMethod
+
+define method .userbuttsetup()
+setup form !!usersetupform at xr 5 yr 5
+Title 'User Button Command Setting'
+option .filelist at x0 ymax '' call |!!tpnp4.commandlistup()| width 4
+button .newlist at x-0.2 y2 'New 
+Command' tooltip 'New Command List Create' call |!!tpnp4.newcommandlist()| width 6.5 height 1.5
+text .txtuser1 at xmax.filelist ymin.filelist 'User1' Tagwidth 6 width 13 is string
+text .txtuser2 at xmax0.2 ymin 'User2' Tagwidth 6 width 13 is string
+text .txtuser3 at xmin.txtuser1 ymax 'User3' Tagwidth 6 width 13 is string
+text .txtuser4 at xmax0.2 ymin 'User4' Tagwidth 6 width 13 is string
+text .txtuser5 at xmin.txtuser3 ymax 'User5' Tagwidth 6 width 13 is string
+text .txtuser6 at xmax0.2 ymin 'User6' Tagwidth 6 width 13 is string
+text .txtuser7 at xmin.txtuser5 ymax 'User7' Tagwidth 6 width 13 is string
+text .txtuser8 at xmax0.2 ymin 'User8' Tagwidth 6 width 13 is string
+text .txtuser9 at xmin.txtuser7 ymax 'User9' Tagwidth 6 width 13 is string
+text .txtuser10 at xmax0.2 ymin 'User10' Tagwidth 6 width 13 is string
+text .txtuser11 at xmin.txtuser9 ymax 'User11' Tagwidth 6 width 13 is string
+button .userbutsave at xmax7.5 ymin0.2 'Save Button' call |!!tpnp4.savebutton()|
+exit
+var !user user
+!userdir = |Z:\TPNP\Function\AM-macro-user\$!user|
+!userfile1 = Object File('$!userdir\user-button.txt')
+!userlist = !userfile1.readfile()
+!userfile1.close()
+!ar = array()
+
+do !k index !userlist
+!ar.append('$!k')
+enddo
+!this.filelist.dtext = !ar
+show!!usersetupform
+!!tpnp4.commandlistup()
+endmethod
+
+
+define method .newcommandlist()
+var !user user
+!userdir = |Z:\TPNP\Function\AM-macro-user\$!user|
+!userfile1 = Object File('$!userdir\user-button.txt')
+!userlist = !userfile1.readfile()
+!userfile1.close()
+!size = !userlist.size() + 1
+!userlist.append('$!size')
+!file = object file('$!userdir\user-button.txt')
+!file.open('overwrite')
+!file.writefile('overwrite',!userlist)
+!file.close()
+!userfile2 = Object File('$!userdir\user-button.txt')
+!userlist1 = !userfile1.readfile()
+!userfile2.close()
+!ar = array()
+do !k index !userlist1
+!ar.append('$!k')
+enddo
+!!usersetupform.filelist.dtext = !ar
+!!usersetupform.filelist.val = $!size
+!this.commandlistup()
+endmethod
+
+define method .commandlistup()
+var !user user
+!userdir = |Z:\TPNP\Function\AM-macro-user\$!user|
+!userfile1 = Object File('$!userdir\user-button.txt')
+!userlist = !userfile1.readfile()
+!userfile1.close()
+!currnet = $!!usersetupform.filelist.val
+!sel = |$!userlist[$!currnet]|
+handle (2,752)
+!this.newcommandlist()
+return
+endhandle
+do !k to 11
+!c = $!k + 1
+!part = !sel.part($!c,'	')
+!txt = |txtuser| + |$!k| + |.val|
+!!usersetupform.$!txt = |$!part|
+enddo
+endmethod
+
+
+define method .savebutton()
+var !user user
+!userdir = |Z:\TPNP\Function\AM-macro-user\$!user|
+!userfile = Object File('$!userdir\user-button.txt')
+!userlist = !userfile.readfile()
+!userfile.close()
+!currnet = $!!usersetupform.filelist.val
+!ar = array()
+do !k to 11
+!txt = |txtuser| + |$!k| + |.val|
+!tx = !!usersetupform.$!txt
+!ar.append('$!tx')
+enddo
+!usertxt = |$!currnet	$!ar[1]	$!ar[2]	$!ar[3]	$!ar[4]	$!ar[5]	$!ar[6]	$!ar[7]	$!ar[8]	$!ar[9]	$!ar[10]	$!ar[11]|
+!userlist[$!currnet] = |$!usertxt|
+!file = object file('$!userdir\user-button.txt')
+!file.open('overwrite')
+!file.writefile('overwrite',!userlist)
+!file.close()
+!sel = |$!userlist[$!currnet]|
+do !k to 11
+!c = $!k + 1
+!part = !sel.part($!c,'	')
+!txt = |txtuser| + |$!k| + |.val|
+
+!command = !!usersetupform.$!txt
+!formcall = |butuser| + |$!k| + |.callback|
+!tooptip = |butuser| + |$!k| + |.settooltip('$!ar[$!k]')|
+!formtag = |butuser| + |$!k| + |.tag|
+!this.$!formcall = |$!ar[$!k]|
+!tag = substring('$!ar[$!k]',1,8)
+!this.$!tooptip
+!this.$!formtag = |$!tag|
+
+enddo
+endmethod
+$p 2017.11.15-Version 1.0 for TPNP
