@@ -1,0 +1,17 @@
+Frame .frmlook at xmax+0.5 ymin      'view'
+
+        Button .Lookeast   at x0.5 y0.5   width 5 'Look-E'   call '!!gphViews.look(!!gph3ddesign1.view,e)'
+
+        Button .Lookwest   at xmax ymin   width 5 'Look-W'   call '!!gphViews.look(!!gph3ddesign1.view,W)'
+
+        Button .Looksouth   at x0.5 ymax   width 5 'Look-S'  call '!!gphViews.look(!!gph3ddesign1.view,S)'
+
+        Button .Looknorth   at xmax ymin   width 5 'Look-N'  call '!!gphViews.look(!!gph3ddesign1.view,N)'
+
+        Button .Lookup     at x0.5 ymax    width 5 'Look-U'  call '!!gphViews.look(!!gph3ddesign1.view,N90U)'
+
+        Button .Lookdown   at xmax ymin   width 5 'Look-D'   call '!!gphViews.look(!!gph3ddesign1.view,N90D)'
+
+  exit   $( END PROGRAM $)
+
+​
